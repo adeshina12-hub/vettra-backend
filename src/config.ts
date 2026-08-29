@@ -15,6 +15,11 @@ export const config = {
     geminiApiKey: required("GEMINI_API_KEY"),
     chainGptApiKey: required("CHAIN_GPT_API_KEY"),
     geminiModel: required("GEMINI_MODEL", "gemini-3.6-flash"),
+    chainGptModel: required("CHAIN_GPT_MODEL", "general_assistant"),
+  },
+
+  coingecko: {
+    apiKey: required("COINGECKO_API_KEY"),
   },
 
   // Optional - GitHub allows 60 unauthenticated requests/hour, 5000 with a

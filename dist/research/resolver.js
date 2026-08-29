@@ -1,4 +1,4 @@
-const COINGECKO_BASE = "https://api.coingecko.com/api/v3";
+import { fetchCoinGecko } from "./coingecko.js";
 /**
  * Resolves a free-text query (name, ticker, or partial match) into a full
  * profile every research module can use. CoinGecko's free /search + /coins
@@ -11,19 +11,14 @@ const COINGECKO_BASE = "https://api.coingecko.com/api/v3";
  */
 export async function resolveProject(query) {
     try {
-        const searchRes = await fetch(`${COINGECKO_BASE}/search?query=${encodeURIComponent(query)}`);
-        if (!searchRes.ok)
-            throw new Error(`search failed: ${searchRes.status}`);
-        const searchData = (await searchRes.json());
-        const top = searchData.coins?.[0];
+        const searchData = await fetchCoinGecko(`/search?query=${encodeURIComponent(query)}`);
+        const normalizedQuery = query.trim().toLowerCase();
+        const top = searchData.coins?.find((coin) => coin.name.toLowerCase() === normalizedQuery || coin.symbol.toLowerCase() === normalizedQuery) ?? searchData.coins?.[0];
         if (!top) {
             console.warn(`[resolver] no CoinGecko match for "${query}" — proceeding with name only`);
             return { query, name: query };
         }
-        const detailRes = await fetch(`${COINGECKO_BASE}/coins/${top.id}?localization=false&tickers=false&market_data=false&community_data=false&developer_data=false`);
-        if (!detailRes.ok)
-            throw new Error(`coin detail failed: ${detailRes.status}`);
-        const detail = (await detailRes.json());
+        const detail = await fetchCoinGecko(`/coins/${top.id}?localization=false&tickers=false&market_data=false&community_data=false&developer_data=false`);
         const homepageCandidates = detail.links?.homepage ?? [];
         const explicitGithubUrls = detail.links?.repos_url?.github ?? [];
         const githubRepo = findGithubRepo([...explicitGithubUrls, ...homepageCandidates]);

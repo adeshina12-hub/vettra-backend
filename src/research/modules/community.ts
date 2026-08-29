@@ -1,5 +1,6 @@
 import { config } from "../../config.js";
 import type { CriterionResult, ProjectProfile } from "../../types.js";
+import { fetchCoinGecko } from "../coingecko.js";
 
 export async function analyzeCommunity(profile: ProjectProfile): Promise<CriterionResult> {
   const notes: string[] = [];
@@ -7,17 +8,15 @@ export async function analyzeCommunity(profile: ProjectProfile): Promise<Criteri
 
   if (profile.coingeckoId) {
     try {
-      const res = await fetch(
-        `https://api.coingecko.com/api/v3/coins/${profile.coingeckoId}?localization=false&tickers=false&market_data=false&community_data=true&developer_data=false`
+      const responseData = await fetchCoinGecko<any>(
+        `/coins/${profile.coingeckoId}?localization=false&tickers=false&market_data=false&community_data=true&developer_data=false`
       );
-      if (res.ok) {
-        const cd = (await res.json()).community_data;
-        notes.push(
-          `X/Twitter followers: ${cd.twitter_followers?.toLocaleString() ?? "n/a"}. Reddit subscribers: ${cd.reddit_subscribers?.toLocaleString() ?? "n/a"}.`
-        );
-        data.twitterFollowers = cd.twitter_followers;
-        data.redditSubscribers = cd.reddit_subscribers;
-      }
+      const cd = responseData.community_data ?? {};
+      notes.push(
+        `X/Twitter followers: ${cd.twitter_followers?.toLocaleString() ?? "n/a"}. Reddit subscribers: ${cd.reddit_subscribers?.toLocaleString() ?? "n/a"}.`
+      );
+      data.twitterFollowers = cd.twitter_followers;
+      data.redditSubscribers = cd.reddit_subscribers;
     } catch (err) {
       console.error("[community] CoinGecko fetch failed:", err);
     }

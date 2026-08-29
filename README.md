@@ -31,6 +31,8 @@ index.ts              → orchestrator, runs the pipeline every 15 min (cron)
    the SQL Editor run `supabase/schema.sql` once to create the tables.
 3. Copy `.env.example` to `.env` and fill in:
    - `ANTHROPIC_API_KEY` — required, this is what scores/reasons about signals
+  - `COINGECKO_API_KEY` — recommended for production; create a free CoinGecko Demo API key and add it to the Render service environment
+  - `CHAIN_GPT_API_KEY` — optional ChainGPT Web3 LLM key; its model defaults to `general_assistant`
    - `SUPABASE_URL` / `SUPABASE_SERVICE_KEY` — from your Supabase project's
      Settings → API (use the **service_role** key, not anon/public)
    - `LUNARCRUSH_API_KEY` — free tier, for the social collector

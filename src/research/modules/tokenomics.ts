@@ -1,4 +1,5 @@
 import type { CriterionResult, ProjectProfile } from "../../types.js";
+import { fetchCoinGecko } from "../coingecko.js";
 
 export async function analyzeTokenomics(profile: ProjectProfile): Promise<CriterionResult> {
   if (!profile.coingeckoId) {
@@ -11,11 +12,9 @@ export async function analyzeTokenomics(profile: ProjectProfile): Promise<Criter
   }
 
   try {
-    const res = await fetch(
-      `https://api.coingecko.com/api/v3/coins/${profile.coingeckoId}?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false`
+    const data = await fetchCoinGecko<any>(
+      `/coins/${profile.coingeckoId}?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false`
     );
-    if (!res.ok) throw new Error(`CoinGecko fetch failed: ${res.status}`);
-    const data = await res.json();
     const md = data.market_data;
 
     const circulating = md.circulating_supply as number | null;

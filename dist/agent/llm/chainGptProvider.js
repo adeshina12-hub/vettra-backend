@@ -12,13 +12,15 @@ export class ChainGptProvider {
                 Accept: "text/plain, application/json",
             },
             body: JSON.stringify({
-                model: "smart_contract_auditor",
+                model: config.llm.chainGptModel,
                 question: `${system}\n\n${userPrompt}`,
                 chatHistory: "off",
             }),
         });
-        if (!response.ok)
-            throw new Error(`ChainGPT audit failed: ${response.status}`);
+        if (!response.ok) {
+            const errorBody = (await response.text()).slice(0, 500);
+            throw new Error(`ChainGPT request failed: ${response.status} ${errorBody}`);
+        }
         const text = await response.text();
         const parsedResponse = parseJsonLoose(text);
         const output = parsedResponse?.data?.bot ?? parsedResponse?.bot ?? text;

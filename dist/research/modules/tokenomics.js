@@ -1,3 +1,4 @@
+import { fetchCoinGecko } from "../coingecko.js";
 export async function analyzeTokenomics(profile) {
     if (!profile.coingeckoId) {
         return {
@@ -8,10 +9,7 @@ export async function analyzeTokenomics(profile) {
         };
     }
     try {
-        const res = await fetch(`https://api.coingecko.com/api/v3/coins/${profile.coingeckoId}?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false`);
-        if (!res.ok)
-            throw new Error(`CoinGecko fetch failed: ${res.status}`);
-        const data = await res.json();
+        const data = await fetchCoinGecko(`/coins/${profile.coingeckoId}?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false`);
         const md = data.market_data;
         const circulating = md.circulating_supply;
         const total = md.total_supply;
